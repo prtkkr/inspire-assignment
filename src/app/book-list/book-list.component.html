@@ -1,0 +1,118 @@
+<div class="fluid-container" *ngIf="data">
+  <div class="header">
+    <h2 class="mb-0">
+      <strong>{{ data.author }}</strong>
+    </h2>
+    <p class="mt-0">
+      <i
+        >Born on
+        <span class="text-primary">{{ data.birthday }}</span>
+        in
+        <span class="text-primary">{{ data.birthPlace }}</span>
+      </i>
+    </p>
+  </div>
+
+  <div #bookForm class="book-list">
+    <!-- Book List Header -->
+    <div class="d-flex justify-content-between">
+      <h3>Books ({{ data.books.length }})</h3>
+      <button class="btn btn-primary" (click)="onAddNewBook()">
+        {{ headerBtnText }}
+      </button>
+    </div>
+
+    <!-- Add Book Form -->
+    <div class="d-flex justify-content-center" *ngIf="isFormVisible">
+      <form [formGroup]="addForm" (ngSubmit)="onSubmit()" style="width: 550px">
+        <div>
+          <label for="title">Title<span class="text-danger">*</span></label>
+          <input
+            id="title"
+            class="form-control"
+            type="text"
+            formControlName="title"
+          />
+          <div class="text-danger">{{ validateTitle() }}</div>
+        </div>
+        <div>
+          <label for="PublishDate"
+            >Publish Year<span class="text-danger">*</span></label
+          >
+          <input
+            id="PublishDate"
+            class="form-control"
+            type="number"
+            formControlName="PublishDate"
+          />
+          <div class="text-danger">{{ validateYear() }}</div>
+        </div>
+        <div>
+          <label for="imageUrl"
+            >Image Url<span class="text-danger">*</span></label
+          >
+          <input
+            id="imageUrl"
+            class="form-control"
+            type="url"
+            formControlName="imageUrl"
+          />
+          <div class="text-danger">{{ validateImageUrl() }}</div>
+        </div>
+        <div>
+          <label for="purchaseLink"
+            >Purchase Url<span class="text-danger">*</span></label
+          >
+          <input
+            id="purchaseLink"
+            class="form-control"
+            type="url"
+            formControlName="purchaseLink"
+          />
+          <div class="text-danger">{{ validateUrl() }}</div>
+        </div>
+        <button class="btn btn-success mt-2 mr-3" type="submit">Submit</button>
+        &nbsp;
+        <button class="btn btn-success mt-2" type="reset">Reset</button>
+      </form>
+    </div>
+
+    <hr />
+    <!-- Books Cards List -->
+    <div class="row">
+      <div
+        class="col-sm-12 col-md-6 d-flex justify-content-center"
+        *ngFor="let book of data.books; index as idx"
+      >
+        <div class="card">
+          <img
+            alt="{{ book.title }}"
+            class="book-image"
+            src="{{ book.imageUrl }}"
+          />
+          <p>
+            <a href="{{ book.purchaseLink }}" target="_blank">
+              <strong>{{ book.title }}</strong>
+            </a>
+          </p>
+          <p class="mb-0">Published In: {{ book.PublishDate }}</p>
+          <div class="util-btn">
+            <button
+              class="btn btn-link"
+              (click)="editBook(bookForm, book, idx)"
+            >
+              Edit
+            </button>
+            <button class="btn btn-link" (click)="deleteBook(book.title)">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Error Message -->
+<div class="fluid-container text-danger text-center mt-5" *ngIf="!data">
+  <h1>Some Error Occurred. Please Refresh!</h1>
+</div>

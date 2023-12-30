@@ -1,0 +1,45 @@
+.header {
+  padding: 15px 15px 1px 15px;
+  background-color: #f0f0f0;
+}
+
+.book-list {
+  margin: 0px 40px;
+  padding: 10px;
+}
+
+.books-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card {
+  padding: 10px;
+  width: min-content;
+  margin-bottom: 15px;
+  text-align: center;
+  background-color: #f0f0f0;
+}
+
+.book-image {
+  width: 250px;
+  height: -webkit-fill-available;
+  margin-bottom: 10px;
+}
+
+a {
+  all: unset;
+  cursor: pointer;
+}
+
+a:hover {
+  color: #1d1dc3;
+}
+
+input.ng-invalid.ng-touched {
+  border: 1px solid #dc3545;
+}
+
+.text-danger {
+  font-size: 13px;
+}
