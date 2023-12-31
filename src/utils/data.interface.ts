@@ -10,4 +10,5 @@ export interface BookInterface {
   imageUrl: string;
   purchaseLink: string;
   title: string;
+  Id: number;
 }

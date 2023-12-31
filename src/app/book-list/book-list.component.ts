@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { map } from 'rxjs';
+import { catchError, map, throwError } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BookListService } from 'src/app/services/book-list.service';
 import { BookInterface, DataInterface } from 'src/utils/data.interface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-book-list',
@@ -15,7 +16,8 @@ export class BookListComponent implements OnInit {
   headerBtnText: string = 'Add Book';
   isFormVisible: boolean = false;
   isEdit: boolean = false;
-  bookIndex: number = -1;
+  sortBy: boolean = false;
+  errorMessage!: string;
 
   constructor(
     private bookListService: BookListService,
@@ -30,10 +32,27 @@ export class BookListComponent implements OnInit {
   getAuthorData() {
     this.bookListService
       .getBook()
-      .pipe(map((result: any) => result.data))
+      .pipe(
+        map((result: any) => {
+          result.data.books.map((x: BookInterface, index: number) => {
+            x.Id = index + 1;
+          });
+          return result.data;
+        }),
+        catchError(this.handleError)
+      )
       .subscribe((res) => {
         this.data = res;
+        this.sortByName();
       });
+  }
+
+  handleError(error: HttpErrorResponse) {
+    let errorMessage = `${error.status} - ${error.statusText}. Please refresh the page.`;
+    alert(errorMessage);
+    return throwError(() => {
+      return errorMessage;
+    });
   }
 
   renderAddForm() {
@@ -42,6 +61,7 @@ export class BookListComponent implements OnInit {
       imageUrl: ['', Validators.required],
       purchaseLink: ['', Validators.required],
       PublishDate: ['', Validators.required],
+      Id: [''],
     });
   }
 
@@ -100,13 +120,16 @@ export class BookListComponent implements OnInit {
 
       if (!this.isEdit) {
         // Add Value to the Books Array
-        this.data.books.unshift(this.addForm.value);
+        this.addForm.controls['Id'].setValue(this.data.books.length + 1);
+        this.data.books.push(this.addForm.value);
+        this.sortBy ? this.sortByDate : this.sortByName();
         this.onAddNewBook();
       } else {
         // Update Books Array with Updated Data
-        this.data.books[this.bookIndex] = this.addForm.value;
+        const { Id } = this.addForm.value;
+        let index = this.data.books.findIndex((x) => x.Id == Id);
+        this.data.books[index] = this.addForm.value;
         this.isEdit = false;
-        this.bookIndex = -1;
         this.onAddNewBook();
       }
     } else {
@@ -119,17 +142,48 @@ export class BookListComponent implements OnInit {
     this.data.books.splice(bookIndex, 1);
   }
 
-  editBook(el: HTMLElement, bookData: BookInterface, index: number) {
+  editBook(el: HTMLElement, bookData: BookInterface) {
     el.scrollIntoView();
     // Open Book Form and Reset any Value
     this.isFormVisible = true;
     this.isEdit = true;
-    this.bookIndex = index;
     this.setButtonText();
     this.addForm.patchValue(bookData);
   }
 
   setButtonText() {
     this.headerBtnText = this.isFormVisible ? 'Hide Form' : 'Add Book';
+  }
+
+  onSortToggle(value: boolean) {
+    value ? this.sortByDate() : this.sortByName();
+  }
+
+  sortByName() {
+    this.data.books.sort((a, b) => {
+      let at = a.title.toLowerCase(),
+        bt = b.title.toLowerCase();
+      if (at < bt) {
+        return -1;
+      }
+      if (at > bt) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
+  sortByDate() {
+    this.data.books.sort((a, b) => {
+      let ad = a.PublishDate,
+        bd = b.PublishDate;
+      if (ad < bd) {
+        return -1;
+      }
+      if (ad > bd) {
+        return 1;
+      }
+      return 0;
+    });
   }
 }

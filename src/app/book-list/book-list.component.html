@@ -15,11 +15,22 @@
 
   <div #bookForm class="book-list">
     <!-- Book List Header -->
-    <div class="d-flex justify-content-between">
-      <h3>Books ({{ data.books.length }})</h3>
+    <div class="d-flex align-items-center">
+      <h4 class="mb-0 flex-grow-1">Books ({{ data.books.length }})</h4>
       <button class="btn btn-primary" (click)="onAddNewBook()">
         {{ headerBtnText }}
       </button>
+      <!-- Sort -->
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="togglesort"
+          [(ngModel)]="sortBy"
+          (change)="onSortToggle(sortBy)"
+        />
+      </div>
     </div>
 
     <!-- Add Book Form -->
@@ -97,10 +108,7 @@
           </p>
           <p class="mb-0">Published In: {{ book.PublishDate }}</p>
           <div class="util-btn">
-            <button
-              class="btn btn-link"
-              (click)="editBook(bookForm, book, idx)"
-            >
+            <button class="btn btn-link" (click)="editBook(bookForm, book)">
               Edit
             </button>
             <button class="btn btn-link" (click)="deleteBook(book.title)">
@@ -111,8 +119,4 @@
       </div>
     </div>
   </div>
-</div>
-<!-- Error Message -->
-<div class="fluid-container text-danger text-center mt-5" *ngIf="!data">
-  <h1>Some Error Occurred. Please Refresh!</h1>
 </div>
